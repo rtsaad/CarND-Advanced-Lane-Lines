@@ -187,10 +187,7 @@ def process_image(img):
 
 The radius curvature is calculated from the fitted 2nd order polynomial. Given the polynomial f(y)=Ay^2+By+C, we apply the following formula for each lane line to obtain the radius curvature:
 
-```python
-
-Rcurve = ((1 + (2Ay + B)^2)^(3/2))/|2A|
-```
+$ Rcurve = ((1 + (2Ay + B)^2)^(3/2))/|2A| $
 
 Assuming that the camera is mounted at the center of the vehicle, to compute the position of the vehicle with respect to the center, we first calculate the center of the detected lanes and subtract it from the center of the image. Below, the formula is presented in details:
 
