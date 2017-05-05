@@ -9,7 +9,7 @@ The main goals of this project is to develop a sequence of operations (pipeline)
 [//]: # (Image References)
 
 [image1]: output_images/output.png "Input and Output images"
-[image2]: output_images/corners2.jpg "Chessboard Corners"
+[image2]: output_images/corners2.png "Chessboard Corners"
 [image3]: output_images/chessboard.png "Undistorted Chessboard"
 [image4]: output_images/gradient_undistorted.png "Gradient"
 [image5]: output_images/warp.png "Bird-Eye View"
@@ -19,7 +19,7 @@ The main goals of this project is to develop a sequence of operations (pipeline)
 
 ## 1.Access 
 
-The source code for this project is available at [project code](https://github.com/otomata/).
+The source code for this project is available at [project code](https://github.com/otomata/CarND-Advanced-Lane-Lines).
 
 ## 2.Files
 
@@ -92,7 +92,7 @@ The code for this step is contained at function `calibrate_camera` from  the `ca
 
 The second step is to construct a binary image with most of the lane lines but without the non-useful parts of the image. We used a combination of gradient and color threshold. For the gradient, we use the `Sobel` operator to take the gradient in the x direction to emphasizes edges closer to vertical. We also use the hls and hsv color spaces to build a binary image to be reliable as possible to different lighting conditions. For the hls color space, we threshold the saturation channel because it is less affected by the lighting conditions. In addition, we also use the hsv color space to isolate the colors yellow and white to enhance the highlight of the lane lines. The code below depicts the combination of the gradient, the hls and hsv threshold. Figure 4 shows the obtained binary image.
 
-"""
+"""python
 combined[((hue == 1) & (hls == 1)) | (gradx == 1) ] = 1
 
 """
@@ -128,7 +128,7 @@ The lane line detection starts with the analysis of the image histogram to ident
 
 Once we have good polynomial fit, we skip the sliding windows and search on the next frame using the information from the previous one. The code for this step is contained at function `fit_again` from  the `lane.py` file (lines 253-285). In addition, we also have a `Line` class to keep track of the last 45 lane lines (or frames) we have detected. We use a confidence value to compute a weighted average in order to smooth the lane lines and to obtain a cleaner result. Our confidence value analyzes how parallel are the left and right lines, given a value (weight) of 1 when parallel or 0 when nonparallel. Below, we present our code to calculate the confidence value:
 
-"""
+"""python
 def confidence(left_radius, right_radius):
     if (left_radius/right_radius) > 99 or (right_radius/left_radius) < 0.01: 
         return 0
@@ -140,7 +140,7 @@ def confidence(left_radius, right_radius):
 
 The code below present our pipeline to process each image, detect, sanity check and later plot it back onto the road. Our `sanity_check` implementation checks the lanes histograms for a minimum threshold and also for a minimum distance between left and right lanes (file `pipeline.py`, lines 20-29). The code for this step is contained at function `process_image` from  the `pipeline.py` file (lines 44-77). Figure 7 depicts an image of the Lane Line plotted back down onto the road.
 
-"""
+"""python
 
 def process_image(img):
     global left_fit, right_fit
@@ -185,20 +185,20 @@ def process_image(img):
 
 The radius curvature is calculated from the fitted 2nd order polynomial. Given the polynomial f(y)=Ay^2+By+C, we apply the following formula for each lane line to obtain the radius curvature:
 
-"""
+"""python
 Rcurve = ((1 + (2Ay + B)^2)^(3/2))/|2A|
 """
 
 Assuming that the camera is mounted at the center of the vehicle, to compute the position of the vehicle with respect to the center, we first calculate the center of the detected lanes and subtract it from the center of the image. Below, the formula is presented in details:
 
-"""
+"""python
 center_lane = center_lane = (lane_left + (lane_right - lane_left)/2)
 center_image = | center_lane - image_widht/2 |
 """
 
 Finaly, we have to convert from pixel to meters. From on our perspective transformation (bird-eye view) source and destination points, we use the following conversions values:
 
-"""
+"""python
 ym_per_pix = 30/720 # meters per pixel in y dimension
 xm_per_pix = 3.7/800 # meters per pixel in x dimension
 """
@@ -209,14 +209,14 @@ The code for this step is contained at function `compute_metrics` from  the `lan
 
 ### Pipeline (video)
 
-Here is the link for the [project_video output](). From the video, our implementation performs reasonably well on the entire project video, our weighted average smoothed the plotted lanes without any visible catastrophic failures that would cause the car to drive off the road.
+Here is the link for the [project_video output](https://www.dropbox.com/s/e0s0kybks3qz8gn/track1.mp4?dl=0). From the video, our implementation performs reasonably well on the entire project video, our weighted average smoothed the plotted lanes without any visible catastrophic failures that would cause the car to drive off the road.
 
 
 ---
 
 ### Discussion
 
-Our implementation uses techniques (hue color) to isolate the yellow and white colors to maximize line detection. However, our algorithm suffered with the different road colors present on  the [challenge_video](). We were able to partially bypass this problem by using an aggressive weighted average to remove low confidence (lane line) fits (Section 8). Here is the link for the [challenge_video output]().
+Our implementation uses techniques (hue color) to isolate the yellow and white colors to maximize line detection. However, our algorithm suffered with the different road colors present on  the [challenge_video](https://www.dropbox.com/s/cavjm5jmk4fj6fs/track2.mp4?dl=0). We were able to partially bypass this problem by using an aggressive weighted average to remove low confidence (lane line) fits (Section 8). Here is the link for the [challenge_video output](https://www.dropbox.com/s/cavjm5jmk4fj6fs/track2.mp4?dl=0).
 
 
-Another problem we came across is that our implementation was not able to perform reasonably with the sharp turns of the `harder_challenge_vide`. We believe that the main problem is that the 2nd order polynomials are not enough to fit more complex curvatures, such the ones presented in this video. For future work, we consider to try 3nd and 4nd order polynomials to improve these results.
+Another problem we came across is that our implementation was not able to perform reasonably with the sharp turns of the [harder_challenge_vide](https://www.dropbox.com/s/wzlruhjivaedocp/track3.mp4?dl=0). We believe that the main problem is that the 2nd order polynomials are not enough to fit more complex curvatures, such the ones presented in this video. For future work, we consider to try 3nd and 4nd order polynomials to improve these results.
